@@ -10,13 +10,14 @@ const App: React.FC = () => {
   const [result, setResult] = useState<SearchResult | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handleSearch = useCallback(async (query: string) => {
+  // handleSearch now accepts an optional image string (base64)
+  const handleSearch = useCallback(async (query: string, image?: string) => {
     setLoadingState(LoadingState.LOADING);
     setResult(null);
     setErrorMsg(null);
 
     try {
-      const data = await getPriceInfo(query);
+      const data = await getPriceInfo(query, image);
       setResult(data);
       setLoadingState(LoadingState.SUCCESS);
     } catch (error) {
@@ -35,7 +36,7 @@ const App: React.FC = () => {
 
       {loadingState === LoadingState.IDLE && (
         <CategoryGrid 
-          onSelectCategory={handleSearch} 
+          onSelectCategory={(catQuery) => handleSearch(catQuery)} 
           isLoading={false} 
         />
       )}

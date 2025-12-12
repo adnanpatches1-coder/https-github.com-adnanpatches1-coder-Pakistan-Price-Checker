@@ -1,5 +1,7 @@
 {
   "name": "Pakistan Price Checker",
   "description": "Real-time price checking app for products in Pakistan using AI and Google Search grounding. Provides average prices, variations, and trusted stores in Urdu/English.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "camera"
+  ]
 }

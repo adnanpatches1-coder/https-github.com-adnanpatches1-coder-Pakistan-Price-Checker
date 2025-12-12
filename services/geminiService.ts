@@ -33,23 +33,43 @@ If you cannot find specific data, make a reasonable estimate based on search res
 Ensure the Urdu is natural and helpful.
 `;
 
-export const getPriceInfo = async (query: string): Promise<SearchResult> => {
+export const getPriceInfo = async (query: string, base64Image?: string): Promise<SearchResult> => {
   if (!apiKey) {
     throw new Error("API Key is missing");
   }
 
   try {
     const model = 'gemini-2.5-flash';
-    const prompt = `Find the latest price and market details for: "${query}" in Pakistan.`;
+    let contents: any;
+
+    if (base64Image) {
+      // Multimodal prompt: Image + Text
+      const promptText = query 
+        ? `Identify the product in this image and find its latest price and market details in Pakistan. Context: ${query}` 
+        : `Identify the product in this image and find its latest price and market details in Pakistan.`;
+        
+      contents = {
+        parts: [
+          {
+            inlineData: {
+              mimeType: 'image/jpeg',
+              data: base64Image
+            }
+          },
+          { text: promptText }
+        ]
+      };
+    } else {
+      // Text-only prompt
+      contents = `Find the latest price and market details for: "${query}" in Pakistan.`;
+    }
 
     const response = await ai.models.generateContent({
       model: model,
-      contents: prompt,
+      contents: contents,
       config: {
         tools: [{ googleSearch: {} }],
         systemInstruction: SYSTEM_INSTRUCTION,
-        // We cannot use responseMimeType: 'application/json' with googleSearch, 
-        // so we rely on the prompt to format it as JSON code block.
       }
     });
 
